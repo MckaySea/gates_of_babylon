@@ -185,11 +185,15 @@ export function circuitBlockLines(circuit) {
 }
 
 export function truthTableLines(circuit) {
-  const n = countInputs(circuit)
-  const header = [...Array.from({ length: n }, (_, i) => i), 'O'].join('|')
+  return formatTruthTable(countInputs(circuit), truthTable(circuit))
+}
+
+// Shared with the canvas, which builds its rows from the drawn circuit.
+export function formatTruthTable(pinCount, rows) {
+  const header = [...Array.from({ length: pinCount }, (_, i) => i), 'O'].join('|')
   return [
     'Input Pins (Numbers), Output Pin (O):',
     header,
-    ...truthTable(circuit).map((row) => [...row.inputs, row.output].join('|')),
+    ...rows.map((row) => [...row.inputs, row.output].join('|')),
   ]
 }

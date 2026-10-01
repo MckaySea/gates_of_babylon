@@ -1,0 +1,675 @@
+/* ---------- layout ---------- */
+
+.canvas-mode {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+@media (min-width: 1000px) {
+  .canvas-mode {
+    grid-template-columns: minmax(0, 1fr) 360px;
+  }
+}
+
+.canvas-main {
+  min-width: 0;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+/* ---------- toolbar ---------- */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.palette-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  width: 62px;
+  padding: 5px 4px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  cursor: grab;
+}
+
+.palette-item:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.palette-item:active:not(:disabled) {
+  cursor: grabbing;
+}
+
+.palette-item:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.palette-item:focus-visible,
+.toolbar-actions select:focus-visible,
+.pin-toggle:focus-visible,
+.tab:focus-visible,
+.truth-table tbody tr:focus-visible,
+.pin-switch:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.palette-icon {
+  width: 44px;
+  height: 28px;
+}
+
+.toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.toolbar-actions select {
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+}
+
+.button-small {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+/* ---------- canvas ---------- */
+
+.flow {
+  position: relative;
+  height: clamp(440px, 66vh, 680px);
+}
+
+.flow .react-flow {
+  --xy-background-color: var(--surface);
+  --xy-background-pattern-color: var(--border-strong);
+  --xy-edge-stroke: var(--wire-off);
+  --xy-edge-stroke-width: 2;
+  --xy-edge-stroke-selected: var(--accent);
+  --xy-connectionline-stroke: var(--accent);
+  --xy-connectionline-stroke-width: 2;
+  --xy-handle-background-color: var(--surface);
+  --xy-handle-border-color: var(--wire);
+  --xy-selection-background-color: color-mix(in srgb, var(--accent) 10%, transparent);
+  --xy-selection-border: 1px dashed var(--accent);
+  --xy-controls-button-background-color: var(--surface);
+  --xy-controls-button-background-color-hover: var(--surface-2);
+  --xy-controls-button-color: var(--ink);
+  --xy-controls-button-color-hover: var(--ink);
+  --xy-controls-button-border-color: var(--border);
+  --xy-attribution-background-color: transparent;
+}
+
+.flow .react-flow__handle {
+  width: 11px;
+  height: 11px;
+  border-width: 2px;
+}
+
+@media (pointer: coarse) {
+  .flow .react-flow__handle {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.flow .react-flow__handle.connectingto.valid,
+.flow .react-flow__handle.valid {
+  background: var(--success);
+  border-color: var(--success);
+}
+
+.flow .react-flow__edge.wire .react-flow__edge-path {
+  stroke-width: 2;
+}
+
+.flow .react-flow__edge.wire.is-on .react-flow__edge-path {
+  stroke: var(--live);
+  stroke-width: 3;
+}
+
+.flow .react-flow__edge.wire.is-unknown .react-flow__edge-path {
+  stroke-dasharray: 5 4;
+}
+
+.flow .react-flow__edge.selected .react-flow__edge-path {
+  filter: drop-shadow(0 0 3px var(--accent));
+}
+
+.flow-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.flow-notice {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  z-index: 10;
+  max-width: calc(100% - 32px);
+  padding: 8px 14px;
+  font-size: 14px;
+  color: var(--surface);
+  background: var(--ink);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  transform: translateX(-50%);
+}
+
+.flow-help {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+
+/* ---------- parts on the canvas ---------- */
+
+/* "output" is also one of React Flow's built-in node types, which comes with
+   its own box and shadows; our output node draws itself. */
+.flow .react-flow__node-output {
+  width: auto;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+
+.flow .react-flow__node-output.selectable {
+  box-shadow: none;
+}
+
+.part {
+  position: relative;
+  color: var(--ink);
+}
+
+.react-flow__node.selected .part {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.part-label {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.part-bit,
+.gate-node-bit {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pin-node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 112px;
+  height: 40px;
+  padding: 0 10px;
+  background: var(--surface);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 10px;
+}
+
+.pin-node.is-on {
+  border-color: var(--live);
+  box-shadow: 0 0 0 3px var(--live-glow);
+}
+
+.pin-switch {
+  position: relative;
+  flex: none;
+  width: 32px;
+  height: 18px;
+  padding: 0;
+  background: var(--border-strong);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.pin-switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s;
+}
+
+.is-on .pin-switch {
+  background: var(--live);
+}
+
+.is-on .pin-switch-knob {
+  transform: translateX(14px);
+}
+
+.gate-node {
+  width: 80px;
+  height: 50px;
+}
+
+.gate-node .gate-shape {
+  display: block;
+  width: 80px;
+  height: 50px;
+  overflow: visible;
+}
+
+.gate-node-label {
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+.gate-node-label b {
+  font-family: var(--mono);
+  color: var(--ink);
+}
+
+.gate-node-bit {
+  position: absolute;
+  top: -3px;
+  right: 0;
+  color: var(--muted);
+}
+
+.gate-node.is-on .gate-node-bit {
+  color: var(--live);
+}
+
+.output-node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 96px;
+  height: 44px;
+  padding: 0 10px 0 12px;
+  background: var(--surface);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 22px;
+}
+
+.lamp {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  background: var(--gate-off);
+  border: 2px solid var(--wire-off);
+  border-radius: 50%;
+}
+
+.output-node.is-on {
+  border-color: var(--live);
+}
+
+.output-node.is-on .lamp {
+  background: var(--live-fill);
+  border-color: var(--live);
+  box-shadow: 0 0 12px 3px var(--live-glow);
+}
+
+/* gate symbols (canvas and palette) */
+
+.gate-body {
+  fill: var(--gate-off);
+  stroke: var(--wire);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+.gate-body.is-on {
+  fill: var(--live-fill);
+}
+
+.gate-outline {
+  fill: none;
+  stroke: var(--wire);
+  stroke-width: 1.6;
+}
+
+.gate-bubble {
+  fill: var(--gate-off);
+  stroke: var(--wire);
+  stroke-width: 1.6;
+}
+
+.gate-lead {
+  stroke: var(--wire-off);
+  stroke-width: 2;
+}
+
+.gate-lead.is-on {
+  stroke: var(--live);
+  stroke-width: 3;
+}
+
+.gate-lead.is-unknown {
+  stroke-dasharray: 3 3;
+}
+
+.palette-icon .gate-lead {
+  stroke: var(--wire);
+  stroke-width: 1.6;
+}
+
+/* ---------- analysis panel ---------- */
+
+.analysis {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.card {
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.card h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.status-ok {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--success);
+}
+
+.problems {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.problems li + li {
+  margin-top: 3px;
+}
+
+.output-readout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.output-readout b {
+  font-family: var(--mono);
+  color: var(--ink);
+}
+
+.readout-lamp {
+  width: 14px;
+  height: 14px;
+  background: var(--gate-off);
+  border: 2px solid var(--wire-off);
+  border-radius: 50%;
+}
+
+.readout-lamp.is-on {
+  background: var(--live-fill);
+  border-color: var(--live);
+  box-shadow: 0 0 8px 2px var(--live-glow);
+}
+
+.pin-toggles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 6px;
+}
+
+.pin-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 6px 9px;
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.pin-toggle b {
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.pin-toggle.is-on {
+  background: var(--accent-soft);
+  border-color: var(--live);
+}
+
+.card-tabs {
+  padding: 0;
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--ink);
+}
+
+.tab[aria-selected='true'] {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+.tab-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px 16px;
+}
+
+.tab-panel > * {
+  max-width: 100%;
+}
+
+.truth-scroll,
+.parts-scroll {
+  position: relative;
+  align-self: stretch;
+  max-height: 360px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.truth-table,
+.parts-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.truth-table th,
+.parts-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 6px 8px;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.truth-table td {
+  padding: 3px 8px;
+  text-align: center;
+}
+
+.truth-table th,
+.truth-table td {
+  text-align: center;
+}
+
+.truth-table .out-col {
+  font-weight: 700;
+  border-left: 1px solid var(--border);
+}
+
+.truth-table td.bit-0 {
+  color: var(--muted);
+}
+
+.truth-table td.out-col.bit-1 {
+  color: var(--live);
+}
+
+.truth-table tbody tr {
+  cursor: pointer;
+}
+
+.truth-table tbody tr:hover {
+  background: var(--surface-2);
+}
+
+.truth-table tbody tr.is-current {
+  background: var(--accent-soft);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.truth-table tbody tr.is-current td {
+  color: var(--ink);
+}
+
+.parts-table th,
+.parts-table td {
+  padding: 5px 8px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.parts-table tbody tr + tr td {
+  border-top: 1px solid var(--border);
+}
+
+.parts-table td {
+  font-family: var(--sans);
+}
+
+.parts-table td.num {
+  font-family: var(--mono);
+}
+
+.value-chip {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 20px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  border: 1px solid var(--border-strong);
+  border-radius: 5px;
+}
+
+.value-chip.is-on {
+  color: var(--on-accent);
+  background: var(--live);
+  border-color: var(--live);
+}
+
+.block-text {
+  align-self: stretch;
+  max-height: 360px;
+  margin: 0;
+  padding: 12px 14px;
+  overflow: auto;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--term-ink);
+  background: var(--term-bg);
+  border-radius: 8px;
+  tab-size: 8;
+}

@@ -14,6 +14,13 @@
   --danger: #b42318;
   --success: #2c6a37;
 
+  /* live simulation: a wire or gate output that is 1 lights up */
+  --live: #d99a00;
+  --live-fill: #f7c948;
+  --live-glow: rgba(247, 180, 30, 0.45);
+  --wire-off: #a59c8b;
+  --gate-off: #fffdf8;
+
   /* schematic */
   --wire: #2a251e;
   --gate-fill: #f0dca6;
@@ -61,6 +68,12 @@
     --accent-soft: #3a2e12;
     --danger: #ff7a69;
     --success: #86cf92;
+
+    --live: #f2c14e;
+    --live-fill: #e9b33b;
+    --live-glow: rgba(242, 193, 78, 0.35);
+    --wire-off: #6a6152;
+    --gate-off: #221e17;
 
     --wire: #e6dfcf;
     --gate-fill: #5a4718;
