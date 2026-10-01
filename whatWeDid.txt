@@ -1,0 +1,6 @@
+Bruce initially did a lot of the project's logic in cpp thus making my (McKay's) job easier when I converted it to JS and the web. 
+
+
+Bruce - Finished a lot of the core logic in CPP
+
+McKay - Made the website and put everything together in a pretty way.
